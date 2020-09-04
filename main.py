@@ -5,7 +5,7 @@ from openpyxl import *
 from datetime import date
 import xlwings
 
-PATH = "C:/Users/cmb56/Downloads/ECON_256/Market Journal _cmb171.xlsx"  # path to excel file
+PATH = "/Users/matthew/Downloads/MarketJournal.xlsx"  # path to excel file
 SHEET = "Template"  # excel sheet name
 
 wb = load_workbook(PATH)
@@ -19,10 +19,12 @@ def get_val(URL, sec):
     page = requests.get(URL, headers=headers)
     soup = BeautifulSoup(page.content, 'html.parser')
     body = str(soup.find(id=sec[2]))
-    price = body[body.index(sec[0]) + sec[1]: body.index("<", body.index(sec[0]) + sec[1])]
-    if sec[0] == "ltr":  # check for bonds to add percentage sign
-        price += "%"
-    print(price)
+    price = to_float(body[body.index(sec[0]) + sec[1]: body.index("<", body.index(sec[0]) + sec[1])])
+    if sec[0] == "ltr":  # check for bonds
+        print(price,'%')
+        price = price/100 #when excel converts a number to a percent it multiplies it by 100
+    else:
+        print(str(price))
     return price
 
 
@@ -42,6 +44,14 @@ def get_row():
             return i
         i += 1
     return -1
+
+def to_float(price):
+    while True:
+        idx =price.find(',')
+        if idx==-1:
+            return float(price)
+        else:
+            price = price[0:idx]+price[idx+1:]
 
 
 row = get_row()
@@ -106,11 +116,5 @@ print("Bitcoin:", end=" ")
 add_to(get_val('https://finance.yahoo.com/quote/BTC-USD', crypto), row, col)  # Bitcoin
 
 wb.save(PATH)  # LEAVE THIS LINE!
-
-
-
-
-
-
 
 
