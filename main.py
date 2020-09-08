@@ -5,8 +5,8 @@ from openpyxl import *
 from datetime import date
 import xlwings
 # PATH = "/Users/matthew/Downloads/MarketJournal.xlsx"  # path to excel file
-# PATH = "C:/Users/cmb56/Downloads/ECON_256/Market Journal _cmb171.xlsx"
-PATH = "source/testFile.xlsx"
+PATH = "C:/Users/cmb56/Downloads/ECON_256/Market Journal _cmb171.xlsx"
+# PATH = "source/testFile.xlsx"
 
 SHEET = "Template"  # excel sheet name
 
@@ -117,6 +117,9 @@ add_to(get_val('https://finance.yahoo.com/quote/BZ=F', commodity), row, col)  # 
 col += 1  # Column Q
 print("Bitcoin:", end=" ")
 add_to(get_val('https://finance.yahoo.com/quote/BTC-USD', crypto), row, col)  # Bitcoin
+col += 1  # Column R
+notes = input("Please enter Daily Notes (Hit enter to leave blank): ")
+add_to(notes, row, col) # Daily Notes
 
 wb.save(PATH)  # LEAVE THIS LINE!
 
