@@ -4,11 +4,22 @@ import requests
 from openpyxl import *
 from datetime import date
 import xlwings
+import config
 # PATH = "/Users/matthew/Downloads/MarketJournal.xlsx"  # path to excel file
-PATH = "C:/Users/cmb56/Downloads/ECON_256/Market Journal _cmb171.xlsx"
-# PATH = "source/testFile.xlsx"
+# PATH = "C:/Users/cmb56/Downloads/ECON_256/Market Journal _cmb171.xlsx"
+PATH = "source/testFile.xlsx"
 
 SHEET = "Template"  # excel sheet name
+
+# To add to what is collected, create an ID for asset and add to asset_info in config
+# then add it to INPUT_ORDER below
+
+# order that data will be input into spreadsheet, starting with column B
+# leave empty strings to start at columns beyond B
+INPUT_ORDER = ("EURO/USD", "STG/USD", "USD/YEN",  "USD/CNY", "NIKKEI",
+               "DAX", "FTSE", "DJIA", "S&P", "JAPAN10YR", "GERMANY10YR",
+               "UK10YR", "US10YR", "GOLD", "BRENT_CRUDE", "BITCOIN")
+
 
 wb = load_workbook(PATH)
 ws = wb[SHEET]
@@ -59,68 +70,14 @@ def to_float(price):
 
 row = get_row()
 col = 2
-currentPrice = ("data-reactid=\"33\"", 18, 'quote-header-info')
-index = currentPrice  # ("47", 4, 'quote-summary')
-curr = currentPrice  # ("47", 4, 'quote-summary')
-equity = currentPrice  # ("103", 5, 'quote-summary')
-commodity = currentPrice  # ("57", 4, 'quote-summary')
-crypto = currentPrice  # ("49", 4, 'quote-summary')
-bond = ("ltr", 20, 'last_last')
-debug = ("textLoc", 0, 'idName')
 
-
-# Column B
-print("EURO/USD:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/EURUSD=X', curr), row, col)  # EURO/USD Exchange Rate
-col += 1  # Column C
-print("STG/USD:", end=" ")
-add_to((get_val('https://finance.yahoo.com/quote/GBPUSD=X', curr)), row, col)  # STG/USD Exchange Rate
-col += 1  # Column D
-print("USD/YEN:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/JPY=X', curr), row, col)  # USD/YEN Exchange Rate
-col += 1  # Column E
-print("USD/CNY:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/CNY=X', curr), row, col)  # USD/CNY Exchange Rate
-col += 1  # Column F
-print("Nikkei:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/^N225', index), row, col)  # Nikkei 225 Index
-col += 1  # Column G
-print("DAX:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/^GDAXI', index), row, col)  # DAX Performance Index
-col += 1  # Column H
-print("FTSE:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/^FTSE', index), row, col)  # FTSE 100 Index
-col += 1  # Column I
-print("DJIA:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/^DJI', index), row, col)  # Dow Jones Industrial Average
-col += 1  # Column J
-print("S&P:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/^GSPC', index), row, col)  # S&P 500 Index
-col += 1  # Column K
-print("Japan 10 Year:", end=" ")
-add_to(get_val('https://www.investing.com/rates-bonds/japan-10-year-bond-yield', bond), row, col)  # Japan 10 Year Bond
-col += 1  # Column L
-print("Germany 10 Year:", end=" ")
-add_to(get_val('https://www.investing.com/rates-bonds/germany-10-year-bond-yield', bond), row, col)  # Germany 10 Year Bond
-col += 1  # Column M
-print("UK 10 Year:", end=" ")
-add_to(get_val('https://www.investing.com/rates-bonds/uk-10-year-bond-yield', bond), row, col)  # UK 10 Year Bond
-col += 1  # Column N
-print("US 10 Year:", end=" ")
-add_to(get_val('https://www.investing.com/rates-bonds/u.s.-10-year-bond-yield', bond), row, col)  # US 10 Year Bond
-col += 1  # Column O
-print("Gold:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/GC%3DF', commodity), row, col)  # Gold Futures
-col += 1  # Column P
-print("Brent Crude:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/BZ=F', commodity), row, col)  # Brent Crude Futures
-col += 1  # Column Q
-print("Bitcoin:", end=" ")
-add_to(get_val('https://finance.yahoo.com/quote/BTC-USD', crypto), row, col)  # Bitcoin
-col += 1  # Column R
+for asset in INPUT_ORDER:
+    print(asset, end=" ")
+    assetInfo = config.get_asset_info(asset)
+    add_to(get_val(assetInfo[0], assetInfo[1]), row, col)
+    col +=1
 notes = input("Please enter Daily Notes (Hit enter to leave blank): ")
-add_to(notes, row, col) # Daily Notes
-
-wb.save(PATH)  # LEAVE THIS LINE!
+add_to(notes, row, col)
+wb.save(PATH)
 
 
